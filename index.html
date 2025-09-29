@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Database APS SOETTA</title>
+    
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="icon" href="favicon/favicon.ico" sizes="any">
+    <link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+    .nav-button svg {
+        transition: transform 0.2s, stroke 0.2s, fill 0.2s;
+        stroke: #555;
+    }
+    .nav-button:hover svg,
+    .nav-button:focus svg {
+        transform: scale(1.2) rotate(-8deg);
+        stroke: #10b981;
+        fill: #e0f7fa;
+    }
+    .nav-button.nav-active svg {
+        transform: scale(1.2);
+        stroke: #2563eb;
+        fill: #dbeafe;
+    }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+    
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <div id="app-container" class="max-w-md mx-auto bg-white shadow-lg h-screen hidden flex flex-col">
+        
+        <main id="main-content" class="flex-grow p-4 pb-24 overflow-y-auto">
+            <div id="page-beranda" class="page">
+                <div class="flex justify-between items-center mb-4 p-2 bg-gray-50 rounded-lg border">
+                    <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6" />
+                        </svg>
+                    </button>
+                    <h3 id="month-display" class="font-bold text-lg text-gray-800 text-center"></h3>
+                    <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="bg-green-50 border border-green-200 p-3 rounded-lg">
+                        <p class="text-sm text-gray-600">Penjualan (Bulan Ini)</p>
+                        <p id="monthly-sales-card" class="font-bold text-lg text-green-700">Rp 0</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 p-3 rounded-lg">
+                        <p class="text-sm text-gray-600">Belanja (Bulan Ini)</p>
+                        <p id="monthly-expenses-card" class="font-bold text-lg text-red-700">Rp 0</p>
+                    </div>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mb-6">
+                    <p class="text-sm text-gray-600">Pesanan Aktif (Belum Difakturkan)</p>
+                    <div class="flex justify-between items-center mt-1">
+                        <p id="active-orders-count" class="font-bold text-2xl text-blue-700">0 Pesanan</p>
+                        <p id="active-orders-total" class="font-semibold text-lg text-blue-700">Rp 0</p>
+                    </div>
+                </div>
+                <h3 class="font-bold text-lg mb-4">Pintasan</h3>
+                <div class="grid grid-cols-5 gap-2 text-center text-xs text-gray-700 mb-6">
+                    <button id="shortcut-new-order" class="shortcut-btn">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                            </svg></div><span>Pesanan</span>
+                    </button>
+                    <a href="pages/lainnya/laporan_absensi.html" id="shortcut-attendance">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M8 2v4"></path>
+                                <path d="M16 2v4"></path>
+                                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                                <path d="M3 10h18"></path>
+                                <path d="M8 14h.01"></path>
+                                <path d="M12 14h.01"></path>
+                                <path d="M16 14h.01"></path>
+                                <path d="M8 18h.01"></path>
+                                <path d="M12 18h.01"></path>
+                                <path d="M16 18h.01"></path>
+                            </svg></div><span>Absensi</span>
+                    </a>
+                    <a href="pages/reservasi.html" id="shortcut-reservation" class="shortcut-btn">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                <line x1="12" y1="15" x2="12" y2="21"></line>
+                                <line x1="9" y1="18" x2="15" y2="18"></line>
+                            </svg></div><span>Reservasi</span>
+                    </a>
+                    <a href="pages/pihak.html" id="shortcut-new-contact" class="shortcut-btn">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg></div><span>Pelanggan</span>
+                    </a>
+                    <a href="pages/laporan_belanja.html" id="shortcut-new-expense">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2.5 2.5h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6l1.6-8.4H7.1" />
+                            </svg></div><span>Belanja</span>
+                    </a>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg">Grafik Mingguan</h3>
+                    <div class="flex items-center border border-gray-200 rounded-md text-xs font-semibold">
+                        <button data-week="1" class="chart-week-btn px-4 py-1 text-gray-500 rounded-l-md">M1</button>
+                        <button data-week="2" class="chart-week-btn px-4 py-1 text-gray-500 border-l border-r">M2</button>
+                        <button data-week="3" class="chart-week-btn px-4 py-1 text-gray-500 border-r">M3</button>
+                        <button data-week="4" class="chart-week-btn px-4 py-1 text-gray-500 rounded-r-md">M4</button>
+                    </div>
+                </div>
+                <div class="space-y-8 mt-6">
+                    <div>
+                        <h4 class="font-semibold text-md mb-2 text-center text-gray-700">Penjualan (Uang Masuk)</h4>
+                        <canvas id="sales-chart"></canvas>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-md mb-2 text-center text-gray-700">Belanja (Uang Keluar)</h4>
+                        <canvas id="expenses-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div class="fixed bottom-20 right-0 left-0 max-w-md mx-auto z-40">
+            <div id="fab-container" class="absolute bottom-0 right-4 space-y-3"></div>
+            <div id="broadcast-controls" class="hidden absolute bottom-0 w-full bg-white p-3 border-t shadow-lg"></div>
+        </div>
+        <div id="modal-container"></div>
+        <div id="toast" class="toast"></div>
+        
+        <nav id="main-nav">
+            <a href="index.html" class="nav-button nav-active">
+                <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9L12 2L21 9V20A2 2 0 0 1 19 22H5A2 2 0 0 1 3 20V9Z" /></svg>
+                <span class="text-xs">Beranda</span>
+            </a>
+            <a href="pages/pesanan.html" class="nav-button">
+                <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M16 3V6" /><path d="M8 3V6" /></svg>
+                <span class="text-xs">Pesanan</span>
+            </a>
+            <a href="pages/inventaris.html" class="nav-button">
+                <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 3H8V7H16V3Z" /></svg>
+                <span class="text-xs">Menu</span>
+            </a>
+            <a href="pages/pihak.html" class="nav-button">
+                <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4" /><path d="M5.5 21V19A4.5 4.5 0 0 1 10 14.5H14A4.5 4.5 0 0 1 18.5 19V21" /></svg>
+                <span class="text-xs">Pelanggan</span>
+            </a>
+            <a href="pages/rangkuman.html" class="nav-button">
+                <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M7 12H17" /><path d="M7 16H17" /><path d="M7 8H17" /></svg>
+                <span class="text-xs">Rangkuman</span>
+            </a>
+            <a href="pages/lainnya.html" class="nav-button">
+                <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
+                <span class="text-xs">Lainnya</span>
+            </a>
+        </nav>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>
