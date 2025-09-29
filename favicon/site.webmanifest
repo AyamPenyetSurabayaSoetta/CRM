@@ -1,0 +1,21 @@
+{
+  "name": "Database Ayam Penyet Surabaya",
+  "short_name": "Database APS",
+  "description": "Aplikasi database untuk mengelola bisnis Ayam Penyet Surabaya.",
+  "start_url": "../index.html",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#10B981",
+  "icons": [
+    {
+      "src": "web-app-manifest-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "web-app-manifest-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
